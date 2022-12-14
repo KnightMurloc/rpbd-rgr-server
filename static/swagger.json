@@ -1,0 +1,480 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "sean",
+    "version": "1.0.0",
+    "title": "Bar api",
+    "contact": {
+      "email": "murlockkinght@gmail.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "main",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/list": {
+      "get": {
+        "tags": ["main"],
+        "summary": "return object by query",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "requestBody": {
+          "description": "query",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QueryBody"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/get": {
+      "get": {
+        "tags": [
+          "main"
+        ],
+        "summary": "return object by id",
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "description": "the table from which to get objects",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "id of object",
+            "schema": {
+              "type": "integer"
+          }
+        }
+        ]
+
+      }
+    },
+    "/upsert": {
+      "post": {
+        "tags": [
+          "main"
+        ],
+
+      "summary": "insert or update passed in body object into table",
+      "parameters": [
+        {
+          "name": "table",
+          "in": "path",
+          "required": true,
+          "description": "the table from which to get objects",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "response": {
+        "200": {
+          "description": "new object id"
+        }
+      },
+      "requestBody": {
+        "type": "object",
+        "description": "object insert or update",
+        "required": true
+      }
+    }
+  },
+    "/delete": {
+      "post": {
+        "tags": ["main"],
+        "summary": "remove object by id",
+        "parameters": [
+          {
+            "name": "table",
+            "description": "the table from which to remove object",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "description": "object id",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "type": "integer"
+      },
+      "QueryBody": {
+        "type": "object",
+        "properties": {
+          "Table": {
+            "type": "string",
+            "description": "table name"
+          },
+          "StartId": {
+            "type": "integer",
+            "description": "first id for query next package. if not used must be -1"
+          },
+          "EndId": {
+            "type": "integer",
+            "description": "first id for query prev package. if not used must be -1"
+          },
+          "Condition": {
+            "type": "string",
+            "format": "sql",
+            "description": "sql condition for query. if not used must be empty string"
+          }
+        }
+      },
+      "AddressBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          }
+        }
+      },
+      "BankDetailBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "bank_name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "city": {
+            "type": "object",
+            "$ref": "#/components/schemas/CityBody"
+          },
+          "TIN": {
+            "type": "string",
+            "format": "number",
+            "description": "10 digit number"
+          },
+          "settlement_account": {
+            "type": "string",
+            "format": "number",
+            "description": "20 digit number"
+          },
+          "provider": {
+            "type": "object",
+            "$ref": "#/components/schemas/ProviderBody"
+          }
+        }
+      },
+      "CityBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          }
+        }
+      },
+      "DrinkBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "int",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "strength": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "container": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DrinkRecipes"
+            }
+          }
+        }
+      },
+      "DrinkOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "drink":{
+            "$ref": "#/components/schemas/DrinkBody"
+          },
+          "waiter": {
+            "$ref": "#/components/schemas/EmployeesBody"
+          },
+          "table": {
+            "type": "integer"
+          }
+        }
+      },
+      "DrinkRecipes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be 0"
+          },
+          "ingredient": {
+            "$ref": "#/components/schemas/IngredientBody"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      },
+      "EmployeesBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "first_name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "last_name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "patronymic": {
+            "type": "string"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressBody"
+          },
+          "birth_date": {
+            "type": "string",
+            "format": "yyyy-mm-dd"
+          },
+          "salary": {
+            "type": "float"
+          },
+          "post": {
+            "$ref": "#/components/schemas/PostBody"
+          }
+        }
+      },
+      "IngredientBody":{
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "Unit": {
+            "$ref": "#/components/schemas/UnitBody"
+          }
+        }
+      },
+      "OrderBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "reason": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "order_number": {
+            "type": "int"
+          },
+          "order_date": {
+            "type": "string",
+            "format": "yyyy-mm-dd"
+          },
+          "Employer": {
+            "$ref": "#/components/schemas/EmployeesBody",
+            "description": "can be null"
+          },
+          "Post": {
+            "$ref": "#/components/schemas/PostBody"
+          }
+        }
+      },
+      "PostBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          }
+        }
+      },
+      "ProductBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "ingredient": {
+            "$ref": "#/components/schemas/IngredientBody"
+          },
+          "price": {
+            "type": "float"
+          },
+          "delivery_terms": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "payment_terms": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/ProviderBody"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          }
+        }
+      },
+      "ProviderBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "post_address": {
+            "$ref": "#/components/schemas/AddressBody"
+          }
+        }
+      },
+      "Snack": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "type": {
+                "$ref": "#/components/schemas/DrinkRecipes"
+              }
+            }
+          }
+        }
+      },
+      "SnackOrder": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "if it new object must be -1"
+          },
+          "drink":{
+            "$ref": "#/components/schemas/DrinkBody"
+          },
+          "waiter": {
+            "$ref": "#/components/schemas/EmployeesBody"
+          },
+          "table": {
+            "type": "integer"
+          }
+        }
+      },
+      "SnackRecipes": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "int",
+            "description": "if it new object must be 0"
+          },
+          "ingredient": {
+            "$ref": "#/components/schemas/IngredientBody"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      },
+      "UnitBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "int",
+            "description": "if it new object must be 0"
+          },
+          "name": {
+            "type": "string",
+            "description": "not empty"
+          }
+        }
+      }
+    }
+  }
+}
